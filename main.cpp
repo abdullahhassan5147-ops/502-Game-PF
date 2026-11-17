@@ -136,6 +136,7 @@ int Choseplayer2color(string player2name,int player1color,string player1name){
 		
 	}
 	cout<<"Players ready: "<<player1name<<" vs "<<player2name<<". Press Enter to deal";
+	cin.ignore();
 	cin.get();
 	system("CLS");
 	return pc;
