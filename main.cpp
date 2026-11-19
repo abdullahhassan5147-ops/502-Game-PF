@@ -318,7 +318,7 @@ void shuffleDeck(int deck[], int deckSize) {
 }
 void dealcards(int player1hand[],int player2hand[],int& player1handsize,int& player2handsize,int deck[],int& decksize) {
     int j = 0;
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 7; i++) {
         player1hand[i] = deck[j];
         player2hand[i] = deck[j + 1];
         player1handsize++;
@@ -332,12 +332,12 @@ int main() {
     srand(time(0));
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-    int player1handsize=0,player2handsize=0;
-    int player1hand[MAX_HAND], player2hand[MAX_HAND];
-    int decksize=52;
-    int deck[decksize];
     bool running = true;
     while (running) {
+        int player1handsize=0,player2handsize=0;
+        int player1hand[MAX_HAND], player2hand[MAX_HAND];
+        int decksize=52;
+        int deck[DECK_SIZE];
         clearScreen();
         output_main_screen();
         int choice = readChoice(1, 4);
