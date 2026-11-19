@@ -1,0 +1,30 @@
+# Build directories
+build/
+out/
+Debug/
+Release/
+x64/
+x86/
+
+# Compiled files
+*.exe
+*.obj
+*.o
+*.pdb
+*.ilk
+*.dll
+*.lib
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# VS Code
+.vscode/
