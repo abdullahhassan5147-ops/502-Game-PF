@@ -280,9 +280,10 @@ void showInstructions() {
     cin.get();
     clearScreen();
 }
-void createDeck(int deck[], int& deckSize) {
-    for (int i = 0;i < 7;i++) {
-        deck[i]
+void createDeck(int deck[], int &deckSize) {
+    for (int i = 0;i < 52;i++) {
+        deck[i]=i;
+
     }
 }
 
@@ -304,11 +305,36 @@ void showLeaderboard() {
 void playGame(bool vsComputer) {
 }
 
+void shuffleDeck(int deck[], int deckSize) {
+    //This uses the Fisher–Yates shuffle,the basic work flow is that we take the last card at the end of the deck,
+    //we generate a number x,then swap the selected card with the card at position x,x must not be greater then i+1
+    //Search up for more details
+    for (int i = deckSize - 1; i > 0; i--) {
+        int x = rand() % (i + 1);
+        int temp = deck[i];
+        deck[i] = deck[x];
+        deck[x] = temp;
+    }
+}
+void dealcards(int player1hand[],int player2hand[],int& player1handsize,int& player2handsize,int deck[],int& decksize) {
+    int j = 0;
+    for (int i = 0; i < 14; i++) {
+        player1hand[i] = deck[j];
+        player2hand[i] = deck[j + 1];
+        player1handsize++;
+        player2handsize++;
+        j += 2;
+        decksize -= 2;
+    }
+}
+
 int main() {
     srand(time(0));
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    int player1handsize=0,player2handsize=0;
     int player1hand[MAX_HAND], player2hand[MAX_HAND];
+    int decksize=52;
     int deck[decksize];
     bool running = true;
     while (running) {
@@ -322,6 +348,9 @@ int main() {
             int colors[PLAYERS];
             bool isComputer[PLAYERS];
             setupPlayers(names, colors, isComputer, vsComputer);
+            createDeck(deck,decksize);
+            shuffleDeck(deck,decksize);
+            dealcards(player1hand,player2hand,player1handsize,player2handsize,deck,decksize);
             playGame(vsComputer);
         }
         else if (choice == 2) {
