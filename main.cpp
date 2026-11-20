@@ -1,3 +1,4 @@
+
 #include<iostream>
 #include <windows.h>
 #include<cstdlib>
@@ -280,15 +281,12 @@ void showInstructions(){
     cin.get();
     clearScreen();
 }
-<<<<<<< Updated upstream
+
 void createDeck(int deck[], int &deckSize) {
     for (int i = 0;i < 52;i++) {
         deck[i]=i;
-
     }
 }
-=======
->>>>>>> Stashed changes
 
 void clearScreen(){
     system("CLS");
@@ -309,7 +307,6 @@ void playGame(bool vsComputer){
 
 }
 
-<<<<<<< Updated upstream
 void shuffleDeck(int deck[], int deckSize) {
     //This uses the Fisher–Yates shuffle,the basic work flow is that we take the last card at the end of the deck,
     //we generate a number x,then swap the selected card with the card at position x,x must not be greater then i+1
@@ -321,6 +318,7 @@ void shuffleDeck(int deck[], int deckSize) {
         deck[x] = temp;
     }
 }
+
 void dealcards(int player1hand[],int player2hand[],int& player1handsize,int& player2handsize,int deck[],int& decksize) {
     int j = 0;
     for (int i = 0; i < 7; i++) {
@@ -337,39 +335,31 @@ int main() {
     srand(time(0));
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-    bool running = true;
-    while (running) {
-        int player1handsize=0,player2handsize=0;
-        int player1hand[MAX_HAND], player2hand[MAX_HAND];
-        int decksize=52;
-        int deck[DECK_SIZE];
-=======
-int main(){
-    srand(time(0));
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
     bool running=true;
+
     while(running){
->>>>>>> Stashed changes
         clearScreen();
         output_main_screen();
         int choice=readChoice(1,4);
+
         if(choice==1){
             int player1hand[MAX_HAND],player2hand[MAX_HAND];
+            int player1handsize=0,player2handsize=0;
             int deck[DECK_SIZE];
+            int decksize=52;
+
             int playingtype=chooseplayingtype();
             bool vsComputer=(playingtype==2);
             string names[PLAYERS];
             int colors[PLAYERS];
             bool isComputer[PLAYERS];
-<<<<<<< Updated upstream
-            setupPlayers(names, colors, isComputer, vsComputer);
+
+            setupPlayers(names,colors,isComputer,vsComputer);
+
             createDeck(deck,decksize);
             shuffleDeck(deck,decksize);
             dealcards(player1hand,player2hand,player1handsize,player2handsize,deck,decksize);
-=======
-            setupPlayers(names,colors,isComputer,vsComputer);
->>>>>>> Stashed changes
+
             playGame(vsComputer);
         }
         else if(choice==2){
@@ -382,6 +372,7 @@ int main(){
             running=false;
         }
     }
+
     setColor(WHITE, BLACK);
     return 0;
 }
