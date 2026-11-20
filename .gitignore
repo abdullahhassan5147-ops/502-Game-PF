@@ -19,6 +19,7 @@ x86/
 .vs/
 *.user
 *.suo
+*.idea
 
 # CMake generated files
 CMakeFiles/
