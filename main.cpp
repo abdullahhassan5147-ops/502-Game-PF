@@ -4,7 +4,6 @@
 #include<iomanip>
 #include<string>    
 #include<ctime>
-#include<cstdlib>
 using namespace std;
 
 void setColor(int textColor, int bgColor) {
@@ -29,11 +28,11 @@ const int DRAW = 0;
 void clearScreen();
 int getSuit(int card);
 int getValue(int card);
-
+void createDeck(int deck[], int &deckSize);
 void shuffleDeck(int deck[], int deckSize);
-int drawCard(int deck[], int& deckSize, int discardPile[], int& discardSize);
+int drawCard(int deck[], int &deckSize, int discardPile[], int &discardSize);
 bool isLegalCard(int card, int topCard, int demandSuit, int pendingDraw, bool pendingSkip);
-void applyCardEffect(int card, int chosenSuit, int& pendingDraw, bool& pendingSkip, int& demandSuit);
+void applyCardEffect(int card, int chosenSuit, int &pendingDraw, bool &pendingSkip, int &demandSuit);
 int getCardPoints(int card);
 int chooseComputerCard(int hand[], int handSize, int topCard, int demandSuit, int pendingDraw, bool pendingSkip);
 int chooseComputerSuit(int hand[], int handSize);
@@ -45,266 +44,272 @@ void showTopCard(int topCard, int deckSize, int pendingDraw, bool pendingSkip, i
 void printHand(int hand[], int handSize, bool legal[]);
 void showLeaderboard();
 void saveWinner(string winnerName, int winnerScore);
+
 void playGame(bool vsComputer);
 
-int readChoice(int low, int high) {
+int readChoice(int low,int high){
+    cout<<"Enter Value(1-4): ";
     int choice;
-    while (true) {
-        cin >> choice;
-        if (choice >= low && choice <= high) {
+    while(true){
+        if(cin>>choice && choice>=low && choice<=high){
             return choice;
         }
         cin.clear();
-        cin.ignore(10000, '\n');
+        cin.ignore(10000,'\n');
         setColor(LIGHT_RED, BLACK);
-        cout << "Invalid choice. Please enter a number between " << low << " and " << high << ": ";
+        cout<<"Invalid choice. Please enter a number between "<<low<<" and "<<high<<": ";
         setColor(WHITE, BLACK);
     }
 }
 
-int chooseplayingtype() {
+int chooseplayingtype(){
     clearScreen();
-    cout << "             START NEW GAME" << "\n";
-    cout << "--------------------------------------" << "\n";
-    cout << "1. ";
+    cout<<"             START NEW GAME"<<endl;
+    cout<<"--------------------------------------"<<endl;
+    cout<<"1. ";
     setColor(LIGHT_RED, BLACK);
-    cout << "Vs player (2 people share this computer)" << "\n";
+    cout<<"Vs player (2 people share this computer)"<<endl;
     setColor(WHITE, BLACK);
-    cout << "2. ";
+    cout<<"2. ";
     setColor(LIGHT_RED, BLACK);
-    cout << "Vs Computer (you against the computer)" << "\n";
+    cout<<"Vs Computer (you against the computer)"<<endl;
     setColor(WHITE, BLACK);
-    cout << "Enter your choice(1-2): ";
-    int playingType = readChoice(1, 2);
-    cout << "\n";
+    cout<<"Enter your choice(1-2): ";
+    int playingType=readChoice(1,2);
+    cout<<endl;
     return playingType;
 }
 
-string Chooseplayer1name() {
+string Chooseplayer1name(){
     string player;
-    cout << "Enter name for Player 1 (one word): ";
-    cin >> player;
+    cout<<"Enter name for Player 1 (one word): ";
+    cin>>player;
     return player;
 }
 
-string Chooseplayer2name(string player1name) {
+string Chooseplayer2name(string player1name){
     string player;
-    cout << "Enter name for Player 2 (one word): ";
-    cin >> player;
-    while (player == player1name) {
+    cout<<"Enter name for Player 2 (one word): ";
+    cin>>player;
+    while(player==player1name){
         setColor(LIGHT_RED, BLACK);
-        cout << "That name is already taken.";
+        cout<<"That name is already taken.";
         setColor(WHITE, BLACK);
-        cout << " Enter a different name: ";
-        cin >> player;
+        cout<<" Enter a different name: ";
+        cin>>player;
     }
     return player;
 }
 
-int Choseplayer1color(string player1name) {
-    cout << "Choose a color for " << player1name << " :" << "\n";
+int Choseplayer1color(string player1name){
+    cout<<"Choose a color for "<<player1name<<" :"<<endl;
     setColor(BLUE, BLACK);
-    cout << "1.Blue ";
+    cout<<"1.Blue ";
     setColor(CYAN, BLACK);
-    cout << "2.Cyan text ";
+    cout<<"2.Cyan text ";
     setColor(MAGENTA, BLACK);
-    cout << "3.Magenta text ";
+    cout<<"3.Magenta text ";
     setColor(YELLOW, BLACK);
-    cout << "4.Yellow text" << "\n";
+    cout<<"4.Yellow text"<<endl;
     setColor(WHITE, BLACK);
-    cout << "Enter your choice(1-4): ";
-    int pc = readChoice(1, 4);
-    cout << "\n";
+    cout<<"Enter your choice(1-4): ";
+    int pc=readChoice(1,4);
+    cout<<endl;
     return pc;
 }
 
-int Choseplayer2color(string player2name, int player1color) {
-    cout << "Choose a color for " << player2name << " :" << "\n";
-    if (player1color == BLUE) {
+int Choseplayer2color(string player2name,int player1color){
+    cout<<"Choose a color for "<<player2name<<" :"<<endl;
+    if(player1color==BLUE){
         setColor(GREY, BLACK);
-        cout << "1.Blue(taken) ";
+        cout<<"1.Blue(taken) ";
     }
-    else {
+    else{
         setColor(BLUE, BLACK);
-        cout << "1.Blue ";
+        cout<<"1.Blue ";
     }
-    if (player1color == CYAN) {
+    if(player1color==CYAN){
         setColor(GREY, BLACK);
-        cout << "2.Cyan(taken) ";
+        cout<<"2.Cyan(taken) ";
     }
-    else {
+    else{
         setColor(CYAN, BLACK);
-        cout << "2.Cyan ";
+        cout<<"2.Cyan ";
     }
-    if (player1color == MAGENTA) {
+    if(player1color==MAGENTA){
         setColor(GREY, BLACK);
-        cout << "3.Magenta(taken) ";
+        cout<<"3.Magenta(taken) ";
     }
-    else {
+    else{
         setColor(MAGENTA, BLACK);
-        cout << "3.Magenta ";
+        cout<<"3.Magenta ";
     }
-    if (player1color == YELLOW) {
+    if(player1color==YELLOW){
         setColor(GREY, BLACK);
-        cout << "4.Yellow(taken) ";
+        cout<<"4.Yellow(taken) ";
     }
-    else {
+    else{
         setColor(YELLOW, BLACK);
-        cout << "4.Yellow";
+        cout<<"4.Yellow";
     }
     setColor(WHITE, BLACK);
-    cout << "\n";
-    cout << "Enter your choice(1-4): ";
-    int pc = readChoice(1, 4);
-    while ((pc == 1 && player1color == BLUE) || (pc == 2 && player1color == CYAN) || (pc == 3 && player1color == MAGENTA) || (pc == 4 && player1color == YELLOW)) {
+    cout<<endl;
+    cout<<"Enter your choice(1-4): ";
+    int pc=readChoice(1,4);
+    while((pc==1&&player1color==BLUE)||(pc==2&&player1color==CYAN)||(pc==3&&player1color==MAGENTA)||(pc==4&&player1color==YELLOW)){
         setColor(LIGHT_RED, BLACK);
-        cout << "That colour is already taken. ";
+        cout<<"That colour is already taken. ";
         setColor(WHITE, BLACK);
-        cout << "Enter a different choice: ";
-        pc = readChoice(1, 4);
+        cout<<"Enter a different choice: ";
+        pc=readChoice(1,4);
     }
     return pc;
 }
 
-int getPlayerColor(int colorChoice) {
-    if (colorChoice == 1) {
+int getPlayerColor(int colorChoice){
+    if(colorChoice==1){
         return BLUE;
     }
-    else if (colorChoice == 2) {
+    else if(colorChoice==2){
         return CYAN;
     }
-    else if (colorChoice == 3) {
+    else if(colorChoice==3){
         return MAGENTA;
     }
-    else {
+    else{
         return YELLOW;
     }
 }
 
-void setupPlayers(string names[], int colors[], bool isComputer[], bool vsComputer) {
-    names[0] = Chooseplayer1name();
-    colors[0] = getPlayerColor(Choseplayer1color(names[0]));
-    isComputer[0] = false;
+void setupPlayers(string names[], int colors[], bool isComputer[], bool vsComputer){
+    names[0]=Chooseplayer1name();
+    colors[0]=getPlayerColor(Choseplayer1color(names[0]));
+    isComputer[0]=false;
 
-    if (vsComputer) {
-        names[1] = "Computer";
-        isComputer[1] = true;
-        if (colors[0] == BLUE) {
-            colors[1] = CYAN;
+    if(vsComputer){
+        names[1]="Computer";
+        isComputer[1]=true;
+        if(colors[0]==BLUE){
+            colors[1]=CYAN;
         }
-        else {
-            colors[1] = BLUE;
+        else{
+            colors[1]=BLUE;
         }
     }
-    else {
-        names[1] = Chooseplayer2name(names[0]);
-        colors[1] = getPlayerColor(Choseplayer2color(names[1], colors[0]));
-        isComputer[1] = false;
+    else{
+        names[1]=Chooseplayer2name(names[0]);
+        colors[1]=getPlayerColor(Choseplayer2color(names[1],colors[0]));
+        isComputer[1]=false;
     }
 
-    cout << "Players ready: " << names[0] << " vs " << names[1] << ". Press Enter to deal";
-    cin.ignore(10000, '\n');
+    cout<<"Players ready: "<<names[0]<<" vs "<<names[1]<<". Press Enter to deal";
+    cin.ignore(10000,'\n');
     cin.get();
     clearScreen();
 }
 
-void output_main_screen() {
-    cout << "======================================" << "\n";
-    cout << "       WELCOME TO 502 CARD GAME" << "\n";
-    cout << "======================================" << "\n";
-    cout << "               MAIN MENU" << "\n";
-    cout << "--------------------------------------" << "\n";
+void output_main_screen(){
+    cout<<"======================================"<<endl;
+    cout<<"       WELCOME TO 502 CARD GAME"<<endl;
+    cout<<"======================================"<<endl;
+    cout<<"               MAIN MENU"<<endl;
+    cout<<"--------------------------------------"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "1. ";
+    cout<<"1. ";
     setColor(WHITE, BLACK);
-    cout << "Start New Game" << "\n";
+    cout<<"Start New Game"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "2. ";
+    cout<<"2. ";
     setColor(WHITE, BLACK);
-    cout << "Instructions" << "\n";
+    cout<<"Instructions"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "3. ";
+    cout<<"3. ";
     setColor(WHITE, BLACK);
-    cout << "View Leaderboard" << "\n";
+    cout<<"View Leaderboard"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "4. ";
+    cout<<"4. ";
     setColor(WHITE, BLACK);
-    cout << "EXIT" << "\n";
-    cout << "--------------------------------------" << "\n";
+    cout<<"EXIT"<<endl;
+    cout<<"--------------------------------------"<<endl;
 }
 
-void showInstructions() {
+void showInstructions(){
     clearScreen();
-    cout << "--------------------------------------" << "\n";
-    cout << "            INSTRUCTIONS              " << "\n";
-    cout << "--------------------------------------" << "\n";
+    cout<<"--------------------------------------"<<endl;
+    cout<<"            INSTRUCTIONS              "<<endl;
+    cout<<"--------------------------------------"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "1. ";
+    cout<<"1. ";
     setColor(WHITE, BLACK);
-    cout << "Each player gets 7 cards. Empty your hand to win." << "\n";
+    cout<<"Each player gets 7 cards. Empty your hand to win."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "2. ";
+    cout<<"2. ";
     setColor(WHITE, BLACK);
-    cout << "Match the top card by suit or value, or press 0 to draw." << "\n";
+    cout<<"Match the top card by suit or value, or press 0 to draw."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "3. ";
+    cout<<"3. ";
     setColor(WHITE, BLACK);
-    cout << "J  : play on any card and choose the next suit." << "\n";
+    cout<<"J  : play on any card and choose the next suit."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "4. ";
+    cout<<"4. ";
     setColor(WHITE, BLACK);
-    cout << "2  : next player draws 2 (answer with a 2)." << "\n";
+    cout<<"2  : next player draws 2 (answer with a 2)."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "5. ";
+    cout<<"5. ";
     setColor(WHITE, BLACK);
-    cout << "A \u2660  : next player draws 5 (answer with any Ace)." << "\n";
+    cout<<"A \u2660  : next player draws 5 (answer with any Ace)."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "6. ";
+    cout<<"6. ";
     setColor(WHITE, BLACK);
-    cout << "8  : next player is skipped (answer with an 8)." << "\n";
+    cout<<"8  : next player is skipped (answer with an 8)."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "7. ";
+    cout<<"7. ";
     setColor(WHITE, BLACK);
-    cout << "7 \u2665  : play it and you win the round at once!" << "\n";
+    cout<<"7 \u2665  : play it and you win the round at once!"<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "8. ";
+    cout<<"8. ";
     setColor(WHITE, BLACK);
-    cout << "Cards left in your hand are added to your total." << "\n";
+    cout<<"Cards left in your hand are added to your total."<<endl;
     setColor(LIGHT_RED, BLACK);
-    cout << "9. ";
+    cout<<"9. ";
     setColor(WHITE, BLACK);
-    cout << "Reach 502 points and you lose the game." << "\n";
-    cout << "--------------------------------------" << "\n";
-    cout << "(Press Enter to return to the Main Menu...)";
-    cin.ignore(10000, '\n');
+    cout<<"Reach 502 points and you lose the game."<<endl;
+    cout<<"--------------------------------------"<<endl;
+    cout<<"(Press Enter to return to the Main Menu...)";
+    cin.ignore(10000,'\n');
     cin.get();
     clearScreen();
 }
+<<<<<<< Updated upstream
 void createDeck(int deck[], int &deckSize) {
     for (int i = 0;i < 52;i++) {
         deck[i]=i;
 
     }
 }
+=======
+>>>>>>> Stashed changes
 
-void clearScreen() {
+void clearScreen(){
     system("CLS");
 }
 
-int getSuit(int card) {
-    return card / 13;
+int getSuit(int card){
+    return card/13;
 }
 
-int getValue(int card) {
-    return card % 13;
+int getValue(int card){
+    return card%13;
 }
 
-void showLeaderboard() {
+void showLeaderboard(){
 }
 
-void playGame(bool vsComputer) {
+void playGame(bool vsComputer){
+
 }
 
+<<<<<<< Updated upstream
 void shuffleDeck(int deck[], int deckSize) {
     //This uses the Fisher–Yates shuffle,the basic work flow is that we take the last card at the end of the deck,
     //we generate a number x,then swap the selected card with the card at position x,x must not be greater then i+1
@@ -338,29 +343,43 @@ int main() {
         int player1hand[MAX_HAND], player2hand[MAX_HAND];
         int decksize=52;
         int deck[DECK_SIZE];
+=======
+int main(){
+    srand(time(0));
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    bool running=true;
+    while(running){
+>>>>>>> Stashed changes
         clearScreen();
         output_main_screen();
-        int choice = readChoice(1, 4);
-        if (choice == 1) {
-            int playingtype = chooseplayingtype();
-            bool vsComputer = (playingtype == 2);
+        int choice=readChoice(1,4);
+        if(choice==1){
+            int player1hand[MAX_HAND],player2hand[MAX_HAND];
+            int deck[DECK_SIZE];
+            int playingtype=chooseplayingtype();
+            bool vsComputer=(playingtype==2);
             string names[PLAYERS];
             int colors[PLAYERS];
             bool isComputer[PLAYERS];
+<<<<<<< Updated upstream
             setupPlayers(names, colors, isComputer, vsComputer);
             createDeck(deck,decksize);
             shuffleDeck(deck,decksize);
             dealcards(player1hand,player2hand,player1handsize,player2handsize,deck,decksize);
+=======
+            setupPlayers(names,colors,isComputer,vsComputer);
+>>>>>>> Stashed changes
             playGame(vsComputer);
         }
-        else if (choice == 2) {
+        else if(choice==2){
             showInstructions();
         }
-        else if (choice == 3) {
+        else if(choice==3){
             showLeaderboard();
         }
-        else if (choice == 4) {
-            running = false;
+        else if(choice==4){
+            running=false;
         }
     }
     setColor(WHITE, BLACK);
