@@ -25,40 +25,22 @@ const int DRAW = 0;
 void clearScreen();
 int getSuit(int card);
 int getValue(int card);
-
 void createDeck(int deck[], int &deckSize);
 void shuffleDeck(int deck[], int deckSize);
 int drawCard(int deck[], int &deckSize, int discardPile[], int &discardSize);
-
-bool isLegalCard(int card, int topCard, int demandSuit,
-                 int pendingDraw, bool pendingSkip);
-
-void applyCardEffect(int card, int chosenSuit, int &pendingDraw,
-                     bool &pendingSkip, int &demandSuit);
-
+bool isLegalCard(int card, int topCard, int demandSuit,int pendingDraw, bool pendingSkip);
+void applyCardEffect(int card, int chosenSuit, int &pendingDraw,bool &pendingSkip, int &demandSuit);
 int getCardPoints(int card);
-
-int chooseComputerCard(int hand[], int handSize, int topCard,
-                       int demandSuit, int pendingDraw, bool pendingSkip);
-
+int chooseComputerCard(int hand[], int handSize, int topCard,int demandSuit, int pendingDraw, bool pendingSkip);
 int chooseComputerSuit(int hand[], int handSize);
-
 int readChoice(int low, int high);
 void showInstructions();
-
-void setupPlayers(string names[], int colors[], bool isComputer[],
-                  bool vsComputer);
-
-void showScoreboard(string names[], int colors[], int totals[],
-                    int handSize[], int roundNumber, int currentPlayer);
-
-void showTopCard(int topCard, int deckSize, int pendingDraw,
-                 bool pendingSkip, int demandSuit);
-
+void setupPlayers(string names[], int colors[], bool isComputer[],bool vsComputer);
+void showScoreboard(string names[], int colors[], int totals[], int handSize[], int roundNumber, int currentPlayer);
+void showTopCard(int topCard, int deckSize, int pendingDraw,bool pendingSkip, int demandSuit);
 void printHand(int hand[], int handSize, bool legal[]);
 void showLeaderboard();
 void saveWinner(string winnerName, int winnerScore);
-
 void playGame(bool vsComputer);
 
 // Console and card printing
@@ -94,18 +76,16 @@ void printValue(int card) {
     else
         cout << value + 1;
 }
-
 void printSuit(int card) {
     int suit = getSuit(card);
-
     if (suit == SPADES)
-        cout << char(6);
+        cout << "\xE2\x99\xA0"; 
     else if (suit == HEARTS)
-        cout << char(3);
+        cout << "\xE2\x99\xA5"; 
     else if (suit == DIAMONDS)
-        cout << char(4);
+        cout << "\xE2\x99\xA6"; 
     else
-        cout << char(5);
+        cout << "\xE2\x99\xA3";
 }
 
 void printPadding(int card) {
@@ -115,21 +95,23 @@ void printPadding(int card) {
         cout << "  |";
 }
 
-void printCard(int card, int borderColor) {
+void printCard(int card, int borderColor, int row) {
     setColor(borderColor, BLACK);
-    cout << " +-----+\n | ";
 
-    printValue(card);
+    if (row == 1) {
+        cout << " | ";
+        printValue(card);
 
-    if (getSuit(card) == HEARTS || getSuit(card) == DIAMONDS)
-        setColor(LIGHT_RED, BLACK);
+        if (getSuit(card) == HEARTS || getSuit(card) == DIAMONDS)
+            setColor(LIGHT_RED, BLACK);
 
-    printSuit(card);
+        printSuit(card);
+        setColor(borderColor, BLACK);
+        printPadding(card);
+    } else {
+        cout << " +-----+";
+    }
 
-    setColor(borderColor, BLACK);
-    printPadding(card);
-
-    cout << "\n +-----+\n";
     setColor(WHITE, BLACK);
 }
 
@@ -151,18 +133,14 @@ void shuffleDeck(int deck[], int deckSize) {
     }
 }
 
-void dealcards(int player1hand[], int player2hand[],
-               int &player1handsize, int &player2handsize,
-               int deck[], int &decksize) {
+void dealcards(int player1hand[], int player2hand[],int &player1handsize, int &player2handsize,int deck[], int &decksize) {
     int j = 0;
 
     for (int i = 0; i < START_CARDS; i++) {
         player1hand[i] = deck[j];
         player2hand[i] = deck[j + 1];
-
         player1handsize++;
         player2handsize++;
-
         j += 2;
         decksize -= 2;
     }
@@ -171,11 +149,12 @@ void dealcards(int player1hand[], int player2hand[],
 // Menus and player setup
 
 int readChoice(int low, int high) {
-    cout << "Enter Value(1-4): ";
+    cout << "Enter Value( "<<low<<"-"<<high<<"): ";
     int choice;
 
     while (true) {
-        if (cin >> choice && choice >= low && choice <= high) {
+        cin >> choice;
+        if (choice >= low && choice <= high) {
             return choice;
         }
 
@@ -302,16 +281,10 @@ int Choseplayer2color(string player2name, int player1color) {
     setColor(WHITE, BLACK);
     cout << "\n";
     cout << "Enter your choice(1-4): ";
-
     int pc = readChoice(1, 4);
-
-    while ((pc == 1 && player1color == BLUE) ||
-           (pc == 2 && player1color == CYAN) ||
-           (pc == 3 && player1color == MAGENTA) ||
-           (pc == 4 && player1color == YELLOW)) {
+    while ((pc == 1 && player1color == BLUE) ||(pc == 2 && player1color == CYAN) ||(pc == 3 && player1color == MAGENTA) ||(pc == 4 && player1color == YELLOW)) {
         setColor(LIGHT_RED, BLACK);
         cout << "That colour is already taken. ";
-
         setColor(WHITE, BLACK);
         cout << "Enter a different choice: ";
         pc = readChoice(1, 4);
@@ -332,16 +305,13 @@ int getPlayerColor(int colorChoice) {
     }
 }
 
-void setupPlayers(string names[], int colors[], bool isComputer[],
-                  bool vsComputer) {
+void setupPlayers(string names[], int colors[], bool isComputer[],bool vsComputer) {
     names[0] = Chooseplayer1name();
     colors[0] = getPlayerColor(Choseplayer1color(names[0]));
     isComputer[0] = false;
-
     if (vsComputer) {
         names[1] = "Computer";
         isComputer[1] = true;
-
         if (colors[0] == BLUE) {
             colors[1] = CYAN;
         } else {
@@ -451,32 +421,20 @@ void showInstructions() {
     clearScreen();
 }
 
-void showScoreboard(string names[], int colors[], int totals[],
-                    int handSize[], int roundNumber, int currentPlayer) {
+void showScoreboard(string names[], int colors[], int totals[],int handSize[], int roundNumber, int currentPlayer) {
     cout << "==========================================================\n";
-    cout << "  502 CARD GAME                            ROUND "
-         << roundNumber << "\n";
+    cout << "  502 CARD GAME                            ROUND " << roundNumber << "\n";
     cout << "==========================================================\n";
-
-    cout << left << setw(15) << "Player"
-         << setw(15) << "Total"
-         << setw(15) << "Cards in hand" << "\n";
-
-    setColor(colors[0], BLACK);
-    cout << left << setw(15) << names[0];
-
-    setColor(WHITE, BLACK);
-    cout << setw(15) << totals[0]
-         << setw(15) << handSize[0] << "\n";
-
-    setColor(colors[1], BLACK);
-    cout << left << setw(15) << names[1];
-
-    setColor(WHITE, BLACK);
-    cout << setw(15) << totals[1]
-         << setw(15) << handSize[1] << "\n";
-
+    cout << left << setw(4) << ""<< setw(18) << "Player"<< setw(12) << "Total"<< "Cards in hand\n";
     cout << "----------------------------------------------------------\n";
+    for (int i = 0; i < 2; i++) {
+        cout << left << setw(4) << ((currentPlayer == i) ? ">>" : "");
+        setColor(colors[i], BLACK);
+        cout << left << setw(18) << names[i];
+        setColor(WHITE, BLACK);
+        cout << left << setw(12) << totals[i]<< handSize[i] << "\n";
+    }
+    cout << "==========================================================\n";
 }
 
 void showLeaderboard() {
@@ -491,29 +449,58 @@ void playGame(bool vsComputer) {
 
     int player1hand[MAX_HAND], player2hand[MAX_HAND];
     int player1handsize = 0, player2handsize = 0;
-
+    bool penalty2=false,penaltyaceofspades=false,penalty8=false,penaltyjack=false,penalty7ofhearts=false;
     int deck[DECK_SIZE];
     int decksize = 52;
+    
     int Round = 1;
     int TotalPlayer1 = 0;
     int TotalPlayer2 = 0;
-
+    int hands[2][52];
+    int handSize[2] = {player1handsize, player2handsize};
+    int totals[2] = {TotalPlayer1, TotalPlayer2};
     setupPlayers(names, colors, isComputer, vsComputer);
     createDeck(deck, decksize);
     shuffleDeck(deck, decksize);
+    dealcards(player1hand, player2hand, player1handsize,player2handsize, deck, decksize);
+    for(int i=0;i<2;i++){
+        if(i==0){
+            for(int j=0;j<player1handsize;j++){
+                hands[i][j]=player1hand[j];
+            }
+        }
+        else{
+            for(int j=0;j<player2handsize;j++){
+                hands[i][j]=player2hand[j];
+            }
 
-    dealcards(player1hand, player2hand, player1handsize,
-              player2handsize, deck, decksize);
-
+        }
+        
+    }
+    int currentPlayer=0;
     if (!vsComputer) {
         int totals[PLAYERS] = {TotalPlayer1, TotalPlayer2};
         int handSize[PLAYERS] = {player1handsize, player2handsize};
-
-        showScoreboard(names, colors, totals, handSize, Round, 0);
-
-        cout << "Draw Pile: " << decksize
-             << setw(15) << " cards" << "Top Card:" << "\n";
-
+        showScoreboard(names, colors, totals, handSize, Round, currentPlayer);
+        cout << "Draw Pile: " << decksize<< setw(15) << " cards" << "Top Card:" << "\n"<<"\n";
+        if(Round==1){
+            //Top Card Null
+            cout<<names[0]<<"'s hand (";
+            setColor(LIGHT_GREEN,BLACK);
+            cout<<"green";setColor(WHITE,BLACK);cout<<" = can play, ";setColor(GREY,BLACK);cout<<"grey";setColor(WHITE,BLACK);cout<<"= cannot play)"<<"\n";
+            for (int row = 0; row < 3; row++) {
+                for (int i = 0; i < handSize[currentPlayer]; i++) {
+                    printCard(hands[currentPlayer][i], LIGHT_GREEN, row);
+                }
+                cout << '\n';
+            }
+            if(currentPlayer==0){
+                currentPlayer=1;
+            }
+            else{
+                currentPlayer=0;
+            }
+        }
         cout << "Press Enter to return to the main menu...";
         cin.get();
     }
